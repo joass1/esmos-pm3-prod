@@ -1,0 +1,78 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: esmos-ingress
+  namespace: production
+  annotations:
+    # --- Proxy Settings ---
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "720"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
+
+    # --- ModSecurity WAF + OWASP CRS ---
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/enable-owasp-modsecurity-crs: "true"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecRuleEngine On
+      SecRequestBodyAccess On
+      SecResponseBodyAccess Off
+      SecAuditEngine RelevantOnly
+      SecPcreMatchLimit 500000
+      SecPcreMatchLimitRecursion 500000
+      SecRuleRemoveById 200005
+      SecRule REQUEST_URI "@beginsWith /web/database" "id:1000,phase:1,allow,nolog"
+      SecRule REQUEST_URI "@contains /etc/passwd" "id:1001,phase:1,deny,status:403"
+      SecRule REQUEST_URI "@contains ../" "id:1002,phase:1,deny,status:403"
+      SecRule ARGS "@detectXSS" "id:1003,phase:2,deny,status:403"
+      SecRule ARGS "@detectSQLi" "id:1004,phase:2,deny,status:403"
+      SecRule REQUEST_URI "@contains /proc/self" "id:1005,phase:1,deny,status:403"
+      SecRule REQUEST_HEADERS:User-Agent "@contains sqlmap" "id:1006,phase:1,deny,status:403"
+      SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,nolog"
+
+    # --- Rate Limiting (5 req/sec per IP, burst 10) ---
+    nginx.ingress.kubernetes.io/limit-rps: "5"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "2"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+
+    # --- Security Headers + Caching ---
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Permissions-Policy "camera=(), microphone=()" always;
+      add_header Cache-Control "public, max-age=1800" always;
+
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+    - host: odoo.4.144.198.250.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: odoo
+                port:
+                  number: 8069
+    - host: moodle.4.144.198.250.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: moodle
+                port:
+                  number: 80
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: odoo
+                port:
+                  number: 8069

@@ -1,0 +1,24 @@
+trigger:
+  branches:
+    include:
+      - production
+    exclude:
+      - staging
+      - main
+
+pool:
+  name: 'Default'
+
+stages:
+  - stage: DeployProduction
+    displayName: 'Deploy to AKS Production'
+    jobs:
+      - job: DeployKubernetes
+        displayName: 'Apply K8s manifests to AKS'
+        steps:
+          - script: |
+              kubectl apply -f k8s/ -n production
+              sleep 15
+              kubectl get pods -n production
+              kubectl get ingress -n production
+            displayName: 'Deploy K8s manifests'

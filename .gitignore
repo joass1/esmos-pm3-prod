@@ -1,0 +1,17 @@
+# Environment files with real credentials
+docker-compose/.env
+.env
+
+# Planning and local files
+.planning/
+.claude/
+
+# Python
+*.pyc
+__pycache__/
+
+# OS files
+.DS_Store
+
+# Build artifacts
+*.tar.gz
