@@ -21,7 +21,7 @@ metadata:
       SecPcreMatchLimit 500000
       SecPcreMatchLimitRecursion 500000
       SecRuleRemoveById 200005
-      SecRule REQUEST_URI "@beginsWith /web/database" "id:1000,phase:1,allow,nolog"
+      SecRule REQUEST_URI "@beginsWith /web/database" "id:1000,phase:1,deny,status:403"
       SecRule REQUEST_URI "@contains /etc/passwd" "id:1001,phase:1,deny,status:403"
       SecRule REQUEST_URI "@contains ../" "id:1002,phase:1,deny,status:403"
       SecRule ARGS "@detectXSS" "id:1003,phase:2,deny,status:403"
@@ -30,10 +30,10 @@ metadata:
       SecRule REQUEST_HEADERS:User-Agent "@contains sqlmap" "id:1006,phase:1,deny,status:403"
       SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,nolog"
 
-    # --- Rate Limiting (5 req/sec per IP, burst 10) ---
-    nginx.ingress.kubernetes.io/limit-rps: "5"
-    nginx.ingress.kubernetes.io/limit-burst-multiplier: "2"
-    nginx.ingress.kubernetes.io/limit-connections: "10"
+    # --- Rate Limiting (2 req/sec per IP, burst 2) ---
+    nginx.ingress.kubernetes.io/limit-rps: "2"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
+    nginx.ingress.kubernetes.io/limit-connections: "5"
 
     # --- Security Headers + Caching ---
     nginx.ingress.kubernetes.io/configuration-snippet: |
