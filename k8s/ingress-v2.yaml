@@ -28,7 +28,7 @@ metadata:
       SecRule ARGS "@detectSQLi" "id:1004,phase:2,deny,status:403"
       SecRule REQUEST_URI "@contains /proc/self" "id:1005,phase:1,deny,status:403"
       SecRule REQUEST_HEADERS:User-Agent "@contains sqlmap" "id:1006,phase:1,deny,status:403"
-      SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,nolog"
+      SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,ctl:ruleRemoveById=1003,ctl:ruleRemoveById=1004,nolog"
 
     # --- Rate Limiting (5 req/sec per IP, burst 10) ---
     nginx.ingress.kubernetes.io/limit-rps: "5"
