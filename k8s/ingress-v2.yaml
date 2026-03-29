@@ -35,6 +35,10 @@ metadata:
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "2"
     nginx.ingress.kubernetes.io/limit-connections: "10"
 
+    # --- HTTPS / TLS ---
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
     # --- Security Headers + Caching ---
     nginx.ingress.kubernetes.io/configuration-snippet: |
       add_header X-Frame-Options "SAMEORIGIN" always;
@@ -43,11 +47,16 @@ metadata:
       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
       add_header Permissions-Policy "camera=(), microphone=()" always;
       add_header Cache-Control "public, max-age=1800" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
+  tls:
+    - hosts:
+        - esmosmeals.app
+      secretName: esmosmeals-tls
   rules:
-    - host: odoo.4.144.198.250.nip.io
+    - host: esmosmeals.app
       http:
         paths:
           - path: /

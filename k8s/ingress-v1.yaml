@@ -8,8 +8,12 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
+  tls:
+    - hosts:
+        - esmosmeals.app
+      secretName: esmosmeals-tls
   rules:
-    - host: odoo.4.144.198.250.nip.io
+    - host: esmosmeals.app
       http:
         paths:
           - path: /
