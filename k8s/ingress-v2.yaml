@@ -77,12 +77,3 @@ spec:
                 name: moodle
                 port:
                   number: 80
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: odoo
-                port:
-                  number: 8069
