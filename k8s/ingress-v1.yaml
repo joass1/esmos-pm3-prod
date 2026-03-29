@@ -8,13 +8,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
-  tls:
-    - hosts:
-        - esmosmeals.app
-        - moodle.esmosmeals.app
-      secretName: esmosmeals-tls
   rules:
-    - host: esmosmeals.app
+    - host: odoo.4.144.198.250.nip.io
       http:
         paths:
           - path: /
@@ -24,7 +19,7 @@ spec:
                 name: odoo
                 port:
                   number: 8069
-    - host: moodle.esmosmeals.app
+    - host: moodle.4.144.198.250.nip.io
       http:
         paths:
           - path: /
@@ -34,3 +29,12 @@ spec:
                 name: moodle
                 port:
                   number: 80
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: odoo
+                port:
+                  number: 8069
