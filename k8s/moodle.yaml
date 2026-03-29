@@ -20,7 +20,7 @@ spec:
             - containerPort: 80
           env:
             - name: MOODLE_URL
-              value: "http://moodle.4.144.198.250.nip.io"
+              value: "https://moodle.esmosmeals.app"
             - name: MOODLE_DB_HOST
               value: moodle-db
             - name: MOODLE_DB_PORT

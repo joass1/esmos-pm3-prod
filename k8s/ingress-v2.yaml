@@ -54,6 +54,7 @@ spec:
   tls:
     - hosts:
         - esmosmeals.app
+        - moodle.esmosmeals.app
       secretName: esmosmeals-tls
   rules:
     - host: esmosmeals.app
@@ -66,7 +67,7 @@ spec:
                 name: odoo
                 port:
                   number: 8069
-    - host: moodle.4.144.198.250.nip.io
+    - host: moodle.esmosmeals.app
       http:
         paths:
           - path: /
