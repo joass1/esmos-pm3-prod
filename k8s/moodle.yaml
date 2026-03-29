@@ -21,6 +21,8 @@ spec:
           env:
             - name: MOODLE_URL
               value: "https://moodle.esmosmeals.app"
+            - name: MOODLE_SSL
+              value: "true"
             - name: MOODLE_DB_HOST
               value: moodle-db
             - name: MOODLE_DB_PORT
