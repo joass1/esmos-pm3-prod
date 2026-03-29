@@ -28,12 +28,16 @@ metadata:
       SecRule ARGS "@detectSQLi" "id:1004,phase:2,deny,status:403"
       SecRule REQUEST_URI "@contains /proc/self" "id:1005,phase:1,deny,status:403"
       SecRule REQUEST_HEADERS:User-Agent "@contains sqlmap" "id:1006,phase:1,deny,status:403"
-      SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,nolog"
+      SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,ctl:ruleRemoveById=1003,ctl:ruleRemoveById=1004,nolog"
 
     # --- Rate Limiting (2 req/sec per IP, burst 2) ---
     nginx.ingress.kubernetes.io/limit-rps: "2"
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
     nginx.ingress.kubernetes.io/limit-connections: "5"
+
+    # --- HTTPS / TLS ---
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
     # --- Security Headers + Caching ---
     nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -43,11 +47,17 @@ metadata:
       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
       add_header Permissions-Policy "camera=(), microphone=()" always;
       add_header Cache-Control "public, max-age=1800" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
+  tls:
+    - hosts:
+        - esmosmeals.app
+        - moodle.esmosmeals.app
+      secretName: esmosmeals-tls
   rules:
-    - host: odoo.4.144.198.250.nip.io
+    - host: esmosmeals.app
       http:
         paths:
           - path: /
@@ -57,7 +67,7 @@ spec:
                 name: odoo
                 port:
                   number: 8069
-    - host: moodle.4.144.198.250.nip.io
+    - host: moodle.esmosmeals.app
       http:
         paths:
           - path: /
@@ -67,12 +77,3 @@ spec:
                 name: moodle
                 port:
                   number: 80
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: odoo
-                port:
-                  number: 8069
