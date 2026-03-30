@@ -29,11 +29,12 @@ metadata:
       SecRule REQUEST_URI "@contains /proc/self" "id:1005,phase:1,deny,status:403"
       SecRule REQUEST_HEADERS:User-Agent "@contains sqlmap" "id:1006,phase:1,deny,status:403"
       SecRule REQUEST_HEADERS:Host "@contains moodle" "id:1007,phase:1,ctl:ruleRemoveById=941000-949999,ctl:ruleRemoveById=942000-942999,ctl:ruleRemoveById=1003,ctl:ruleRemoveById=1004,nolog"
+      SecRule REQUEST_URI "@beginsWith /web/dataset/call_kw" "id:1008,phase:1,ctl:ruleRemoveById=1003,ctl:ruleRemoveById=1004,nolog"
 
-    # --- Rate Limiting (2 req/sec per IP, burst 2) ---
-    nginx.ingress.kubernetes.io/limit-rps: "2"
-    nginx.ingress.kubernetes.io/limit-burst-multiplier: "1"
-    nginx.ingress.kubernetes.io/limit-connections: "5"
+    # --- Rate Limiting (20 req/sec per IP, burst 100) ---
+    nginx.ingress.kubernetes.io/limit-rps: "20"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
 
     # --- HTTPS / TLS ---
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
